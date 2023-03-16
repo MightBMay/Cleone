@@ -41,6 +41,8 @@ namespace MightBMaybe.Cleone.Clones
             if (Input.GetKeyDown(KeyCode.R))
             {
                 ClearClones();
+                ResetPowerUps();
+                
             }
 
             UpdateGrabOffset();
@@ -52,6 +54,7 @@ namespace MightBMaybe.Cleone.Clones
         {
             Grab();
         }
+
         public GameObject CreateClone()
         {
             
@@ -98,9 +101,18 @@ namespace MightBMaybe.Cleone.Clones
                 clones.Remove(clones[0]);
             }
         }
+        public void ResetPowerUps()
+        {
+            var powerCollecters = FindObjectsOfType<PowerUpCollecter>();
+            foreach (PowerUpCollecter p in powerCollecters)
+            {
+                p.ResetCollect();
+            }
+        }
         
         private void Grab()
         {
+            
             Transform player = PlayerMovement.pMove.transform;
 
 
@@ -109,8 +121,8 @@ namespace MightBMaybe.Cleone.Clones
             Collider collider = grabbedObject.GetComponent<Collider>();
             Rigidbody rigidBody = grabbedObject.GetComponent<Rigidbody>();
             if (rigidBody.useGravity) rigidBody.useGravity = false;
-            if(collider.enabled) collider.enabled = false;
-
+            //if(collider.enabled) collider.enabled = false;
+            grabbedObject.layer = 8;
             grabbedObject.transform.position = Vector3.Lerp(grabbedObject.transform.position, PlayerMovement.pMove.transform.position + Camera.main.transform.forward*grabOffset, grabSpeed);
 
 
@@ -135,9 +147,10 @@ namespace MightBMaybe.Cleone.Clones
 
             if (grabbedObject != null) {
                 Collider col = grabbedObject.GetComponent<Collider>();
-                Rigidbody rb = grabbedObject.GetComponent<Rigidbody>();
-                if (col != null)col.enabled = true ;
+                Rigidbody rb = grabbedObject.GetComponent<Rigidbody>();               
+                if (col != null) col.enabled = true;
                 if (col != null) rb.useGravity = true;
+                grabbedObject.layer = grabbedObject.GetComponent<CloneBehaviour>().CloneType.GetLayer();
                 return null;
             }
 
@@ -174,6 +187,7 @@ namespace MightBMaybe.Cleone.Clones
             cloneObj.transform.localScale = cloneBehaviour.CloneType.Scale;
             cloneObj.layer = cloneBehaviour.CloneType.GetLayer();
             cloneObj.GetComponent<MeshRenderer>().material.color = type.cloneColour;
+
         }
 
     }

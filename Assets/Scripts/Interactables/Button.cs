@@ -7,7 +7,7 @@ namespace MightBMaybe.Cleone.Interactables
     public class Button : MonoBehaviour
     {
         ButtonType bt;
-        EventTrigger et;
+        public EventTrigger et;
         [Tooltip("Type the type of button (ie what activates the button)\n\nPlayer:    Player, Clones \nClone:   Clones  ")]
         public string buttonType;
         [HideInInspector]
@@ -39,6 +39,7 @@ namespace MightBMaybe.Cleone.Interactables
         }
         private void OnCollisionEnter(Collision collision)
         {
+            if(et.trigger.isTriggered == true) { return; }
             bool canInteract = false;
             foreach (string s in bt.GetTags())
             {
@@ -53,6 +54,7 @@ namespace MightBMaybe.Cleone.Interactables
         }
         private void OnCollisionExit(Collision collision)
         {
+            if (et.trigger.isTriggered == false) { return; }
             bool canInteract = false;
             foreach (string s in bt.GetTags())
             {

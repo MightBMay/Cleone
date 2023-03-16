@@ -2,31 +2,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DoorInfo : MonoBehaviour
+namespace MightBMaybe.Cleone.Interactables
 {
-    public Transform start;
-    public Transform to;
-    public bool isOpen;
-    public float speed;
-    // Start is called before the first frame update
-
-    private void Start()
+    public class DoorInfo : MonoBehaviour
     {
-        start = transform.parent.Find("Start");
-        to = transform.parent.Find("To");
+        public Transform start;
+        public Transform to;
+        public bool isOpen;
+        public float speed;
+        // Start is called before the first frame update
 
-    }
-    public void MoveDoor()
-    {
-        if (isOpen)
+        private void Start()
         {
-            transform.position = start.position;
-            isOpen = false;
+            start = transform.parent.Find("Start");
+            to = transform.parent.Find("To");
 
         }
-        else { 
-            transform.position = to.position;
-            isOpen = true;
+        public void MoveDoor()
+        {
+            if (isOpen)
+            {
+                transform.position = start.position;
+                isOpen = false;
+
+            }
+            else
+            {
+                transform.position = to.position;
+                isOpen = true;
+            }
         }
     }
 }

@@ -32,6 +32,7 @@ namespace MightBMaybe.Cleone.Interactables {
             {
 
                 PlayerStats.pStats.CStats.CurrentCloneType = cloneType;
+                GetComponentInParent<PowerUpCollecter>().Collect();
 
             }
         }

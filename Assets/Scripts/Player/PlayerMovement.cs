@@ -7,6 +7,7 @@ namespace MightBMaybe.Cleone.Player
     public class PlayerMovement : MonoBehaviour
     {
         public static PlayerMovement pMove;
+        SpawnPointManager spawnMan;
         public bool canMove;
         PlayerStats pStats;
         Rigidbody rb;
@@ -19,9 +20,14 @@ namespace MightBMaybe.Cleone.Player
         void Start()
         {
             rb = GetComponent<Rigidbody>();
+            spawnMan = FindObjectOfType<SpawnPointManager>();
         }
 
         // Update is called once per frame
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.R)) { RespawnPlayer(); }
+        }
         void FixedUpdate()
         {
 
@@ -83,6 +89,10 @@ namespace MightBMaybe.Cleone.Player
 
             transform.localRotation = Quaternion.Euler(playerRotation);
             
+        }
+        public void RespawnPlayer()
+        {
+            transform.position = spawnMan.GetClosestSpawnPoint().position;
         }
 
 
