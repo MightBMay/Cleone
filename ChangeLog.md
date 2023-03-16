@@ -1,6 +1,8 @@
 # Cleone
 Cleone Game
 A simple game based around different types of clones.
+Designed and programmed by May Yorke.
+
 
 Change Log:
 
