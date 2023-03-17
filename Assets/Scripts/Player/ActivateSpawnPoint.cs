@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MightBMaybe.Cleone.Clones;
 
 namespace MightBMaybe.Cleone.Player
 {
@@ -14,6 +15,7 @@ namespace MightBMaybe.Cleone.Player
             if (collision.CompareTag("Player"))
             {
                 isActive = true;
+                CloneManager.cloneManager.ResetClonesAndInteractables();
             }
         }
     }

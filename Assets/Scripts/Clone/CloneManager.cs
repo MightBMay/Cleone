@@ -25,12 +25,17 @@ namespace MightBMaybe.Cleone.Clones
         private KeyCode[] cloneKeys = { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3 };
         private GameObject grabbedObject;
         Transform player;
+        Material cloneTextMaterial;
         private void Awake()
         {
             cloneManager = this;
             InstantiateCloneTypeList();
             player = GameObject.Find("PlayerBody").transform;
 
+        }
+        private void Start()
+        {
+             cloneTextMaterial = new Material(Shader.Find("TextMeshPro/DistanceFieldOverlay"));
         }
 
         public List<GameObject> clones = new List<GameObject>();
@@ -61,6 +66,11 @@ namespace MightBMaybe.Cleone.Clones
         {
             Grab();
         }
+        private void InstantiateCloneTypeList()
+        {
+            cloneTypes.Add("NonRigid", new NonRigidClone());
+            cloneTypes.Add("Rigid", new RigidClone());
+        }
 
         public void CreateClone()
         {
@@ -86,36 +96,25 @@ namespace MightBMaybe.Cleone.Clones
 
  
         }
-        private void InstantiateCloneTypeList()
-        {
-            cloneTypes.Add("NonRigid", new NonRigidClone());
-            cloneTypes.Add("Rigid", new RigidClone());
-        }
-        public void ClearClones()
-        {
-            while (clones.Count> 0){
-            
-                Destroy(clones[0]);
-                clones.Remove(clones[0]);
-            }
-        }
-        public void ResetPowerUps()
-        {
-            var powerCollecters = FindObjectsOfType<PowerUpCollecter>();
-            foreach (PowerUpCollecter p in powerCollecters)
-            {
-                p.ResetCollect();
-            }
-        }
-        public void ResetButtons()
-        {
-            var buttons = FindObjectsOfType<Button>();
-            foreach (Button b in buttons)
-            {
-                b.et.trigger.isTriggered = false;
-            }
-        }
         
+        private void AssignCloneData(GameObject cloneObj,CloneTypes type)
+        {
+            // Instantiate a cube primitive
+            // Add a CloneBehaviour script to the cube
+            CloneBehaviour cloneBehaviour = cloneObj.AddComponent<CloneBehaviour>();
+            Rigidbody cloneRB = cloneObj.AddComponent<Rigidbody>();
+            cloneRB.constraints = RigidbodyConstraints.FreezeRotation;
+
+            // Create a new instance of the clonetypes derived class and assign it to the clonetype variable
+            CloneTypes cloneTypeInstance = (CloneTypes)Activator.CreateInstance(type.GetType());
+            cloneBehaviour.CloneType = cloneTypeInstance;
+            cloneObj.tag = cloneBehaviour.CloneType.GetTagName();
+            //cloneObj.transform.position = PlayerMovement.pMove.transform.position + cloneBehaviour.CloneType.PositionOffset;
+            cloneObj.transform.localScale = cloneBehaviour.CloneType.Scale;
+            cloneObj.layer = cloneBehaviour.CloneType.GetLayer();
+            cloneObj.GetComponent<MeshRenderer>().material.color = type.cloneColour;
+
+        }
         private void Grab()
         {
             
@@ -133,6 +132,7 @@ namespace MightBMaybe.Cleone.Clones
 
 
         }
+
         private void UpdateGrabOffset()
         {
             if (grabbedObject != null)
@@ -177,6 +177,7 @@ namespace MightBMaybe.Cleone.Clones
             }
             return null;
         }
+
         public void AddCanvasToWorldSpace(GameObject targetObject)
         {
             // Create a new Canvas object and set its properties
@@ -191,10 +192,23 @@ namespace MightBMaybe.Cleone.Clones
             text.rectTransform.SetParent(canvas.transform, false);
             text.alignment = TextAlignmentOptions.Center;
             text.verticalAlignment = VerticalAlignmentOptions.Middle;
+            //makes text rotate to player
             text.gameObject.AddComponent<RotateTowardPlayer>();
+            
+            Material existingMaterial = text.material;
+
+            // Create a new material based on the existing material
+            Material newMaterial = new Material(existingMaterial);
+
+            // Set the shader on the new material to TextMeshPro/DistanceFieldOverlay
+            newMaterial.shader = Shader.Find("TextMeshPro/DistanceFieldOverlay");
+
+            // Set the new material on the TextMeshPro object
+            text.material = newMaterial;
             UpdateCloneText();
             
         }
+
         public void UpdateCloneText()
         {
             foreach(GameObject g in clones)
@@ -246,30 +260,41 @@ namespace MightBMaybe.Cleone.Clones
                 }
             }
         }
-        private void AssignCloneData(GameObject cloneObj,CloneTypes type)
+
+        
+        public void ClearClones()
         {
-            // Instantiate a cube primitive
-            // Add a CloneBehaviour script to the cube
-            CloneBehaviour cloneBehaviour = cloneObj.AddComponent<CloneBehaviour>();
-            Rigidbody cloneRB = cloneObj.AddComponent<Rigidbody>();
-            cloneRB.constraints = RigidbodyConstraints.FreezeRotation;
-
-            // Create a new instance of the clonetypes derived class and assign it to the clonetype variable
-            CloneTypes cloneTypeInstance = (CloneTypes)Activator.CreateInstance(type.GetType());
-            cloneBehaviour.CloneType = cloneTypeInstance;
-            cloneObj.tag = cloneBehaviour.CloneType.GetTagName();
-            //cloneObj.transform.position = PlayerMovement.pMove.transform.position + cloneBehaviour.CloneType.PositionOffset;
-            cloneObj.transform.localScale = cloneBehaviour.CloneType.Scale;
-            cloneObj.layer = cloneBehaviour.CloneType.GetLayer();
-            cloneObj.GetComponent<MeshRenderer>().material.color = type.cloneColour;
-
+            while (clones.Count> 0){
+            
+                Destroy(clones[0]);
+                clones.Remove(clones[0]);
+            }
         }
 
+        public void ResetPowerUps()
+        {
+            var powerCollecters = FindObjectsOfType<PowerUpCollecter>();
+            foreach (PowerUpCollecter p in powerCollecters)
+            {
+                p.ResetCollect();
+            }
+        }
+
+        public void ResetButtons()
+        {
+            var buttons = FindObjectsOfType<Button>();
+            foreach (Button b in buttons)
+            {
+                b.et.trigger.isTriggered = false;
+            }
+        }
+        
         public void ResetClonesAndInteractables()
         {
             ClearClones();
             ResetPowerUps();
             ResetButtons();
+            PlayerStats.pStats.CStats.CurrentCloneType = null;
         }
 
     }

@@ -93,7 +93,7 @@ namespace MightBMaybe.Cleone.Player
         public void RespawnPlayer()
         {
             transform.position = spawnMan.GetClosestSpawnPoint().position;
-            PlayerStats.pStats.CStats.CurrentCloneType = null;
+            
         }
 
 
