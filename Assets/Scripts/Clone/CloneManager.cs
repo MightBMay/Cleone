@@ -1,8 +1,11 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using TMPro;
 using MightBMaybe.Cleone.Player;
+using MightBMaybe.Cleone.Interactables;
+using MightBMaybe.Cleone.UI;
 namespace MightBMaybe.Cleone.Clones
 {
     public class CloneManager : MonoBehaviour
@@ -19,12 +22,15 @@ namespace MightBMaybe.Cleone.Clones
         public float grabSpeed;
         [Tooltip("self explanitory.")]
         public float maxGrabRange;
+        private KeyCode[] cloneKeys = { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3 };
         private GameObject grabbedObject;
+        Transform player;
         private void Awake()
         {
             cloneManager = this;
             InstantiateCloneTypeList();
-            
+            player = GameObject.Find("PlayerBody").transform;
+
         }
 
         public List<GameObject> clones = new List<GameObject>();
@@ -33,17 +39,18 @@ namespace MightBMaybe.Cleone.Clones
         {
             if (Input.GetKeyDown(KeyCode.C))
             {
-                clones.Add(CreateClone());
+                CreateClone();
+                
             }
             if (Input.GetKeyDown(KeyCode.G)) {
                 grabbedObject = TryGrabClone();
             }
             if (Input.GetKeyDown(KeyCode.R))
             {
-                ClearClones();
-                ResetPowerUps();
-                
+                ResetClonesAndInteractables(); 
             }
+
+            TeleportInput();
 
             UpdateGrabOffset();
            
@@ -55,10 +62,10 @@ namespace MightBMaybe.Cleone.Clones
             Grab();
         }
 
-        public GameObject CreateClone()
+        public void CreateClone()
         {
             
-            if(PlayerStats.pStats.CStats.CurrentCloneType == null) { return null; }
+            if(PlayerStats.pStats.CStats.CurrentCloneType == null) { return; }
             while (clones.Count >= PlayerStats.pStats.CStats.maxCloneCount)
             {
                 Destroy(clones[0]);
@@ -66,27 +73,18 @@ namespace MightBMaybe.Cleone.Clones
             }
             
                 GameObject clone = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Transform player = GameObject.Find("PlayerBody").transform;
+           
                 Vector3 spawnPosition = player.position + player.forward * spawnOffset; // Calculate the spawn position using the player position and forward direction
                 clone.transform.position = spawnPosition;
                 clone.transform.SetParent(transform);// set parent to clone holder
                 clone.transform.position = spawnPosition; // Set the position of the clone directly to the calculated spawn position
                 clone.transform.rotation = player.rotation;
-                
-
-
 
                 AssignCloneData(clone, PlayerStats.pStats.CStats.CurrentCloneType);
-                return clone; 
-            
-            
-                
-                
-              
-           
-            
+                clones.Add(clone);
+                AddCanvasToWorldSpace(clone);
 
-           
+ 
         }
         private void InstantiateCloneTypeList()
         {
@@ -109,11 +107,19 @@ namespace MightBMaybe.Cleone.Clones
                 p.ResetCollect();
             }
         }
+        public void ResetButtons()
+        {
+            var buttons = FindObjectsOfType<Button>();
+            foreach (Button b in buttons)
+            {
+                b.et.trigger.isTriggered = false;
+            }
+        }
         
         private void Grab()
         {
             
-            Transform player = PlayerMovement.pMove.transform;
+            
 
 
             if (grabbedObject == null) return;
@@ -171,6 +177,75 @@ namespace MightBMaybe.Cleone.Clones
             }
             return null;
         }
+        public void AddCanvasToWorldSpace(GameObject targetObject)
+        {
+            // Create a new Canvas object and set its properties
+            Canvas canvas = new GameObject("Canvas", typeof(Canvas), typeof(UnityEngine.UI.CanvasScaler), typeof(UnityEngine.UI.GraphicRaycaster)).GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.WorldSpace;
+            canvas.transform.SetParent(targetObject.transform);
+            canvas.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 1, 0);
+            canvas.transform.localScale = new Vector3(.01f, .005f, .01f);
+
+            // Create a new TextMeshProUGUI object and set its properties
+            TextMeshProUGUI text = new GameObject("Text", typeof(TextMeshProUGUI)).GetComponent<TextMeshProUGUI>();
+            text.rectTransform.SetParent(canvas.transform, false);
+            text.alignment = TextAlignmentOptions.Center;
+            text.verticalAlignment = VerticalAlignmentOptions.Middle;
+            text.gameObject.AddComponent<RotateTowardPlayer>();
+            UpdateCloneText();
+            
+        }
+        public void UpdateCloneText()
+        {
+            foreach(GameObject g in clones)
+            {
+                g.GetComponentInChildren<TextMeshProUGUI>().text = clones.IndexOf(g) + 1 + "\n▼";
+            }
+        }
+
+
+        private void TeleportInput()
+        {
+            // Iterate over the cloneKeys array
+            for (int i = 0; i < cloneKeys.Length; i++)
+            {
+                // Check if the current key is pressed
+                if (Input.GetKeyDown(cloneKeys[i]))
+                {
+                    // Check if the clones list contains a clone at the current index
+                    if (i < clones.Count)
+                    {
+                        // Get the clone at the current index and do something with it
+                        Transform clone = clones[i].transform;
+                        Vector3 cameraPosition = Camera.main.transform.position;
+                        Vector3 clonePosition = clone.position;
+                        Vector3 direction = clonePosition - cameraPosition;
+                        RaycastHit hit;
+                        Physics.Raycast(cameraPosition, direction, out hit);
+                        if (hit.collider.gameObject == clones[i])
+                        {
+                            // No obstacles found, set the player's position and rotation
+                            Vector3 storedPos = player.transform.position;
+                            Quaternion storedRot = player.transform.rotation;
+                            player.transform.position = clonePosition;
+                            player.transform.rotation = clone.rotation;
+                            clone.position = storedPos;
+                            clone.rotation = storedRot;
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Obstacle detected between camera and clone: " + hit.collider.gameObject.name);
+                        }
+
+
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Clones list does not contain a clone at index " + i);
+                    }
+                }
+            }
+        }
         private void AssignCloneData(GameObject cloneObj,CloneTypes type)
         {
             // Instantiate a cube primitive
@@ -188,6 +263,13 @@ namespace MightBMaybe.Cleone.Clones
             cloneObj.layer = cloneBehaviour.CloneType.GetLayer();
             cloneObj.GetComponent<MeshRenderer>().material.color = type.cloneColour;
 
+        }
+
+        public void ResetClonesAndInteractables()
+        {
+            ClearClones();
+            ResetPowerUps();
+            ResetButtons();
         }
 
     }

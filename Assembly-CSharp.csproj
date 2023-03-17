@@ -58,24 +58,26 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Interactables\Door\DoorInfo.cs" />
     <Compile Include="Assets\DefaultURPAssets\Scripts\SimpleCameraController.cs" />
+    <Compile Include="Assets\Scripts\Ui\ChangeTextMeshRend.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraFollow.cs" />
     <Compile Include="Assets\Scripts\Interactables\Powerup.cs" />
     <Compile Include="Assets\Scripts\Interactables\InteractableManager.cs" />
+    <Compile Include="Assets\Scripts\Ui\ChangeTextOnButton.cs" />
+    <Compile Include="Assets\Scripts\Interactables\PowerUpCollecter.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerStats.cs" />
+    <Compile Include="Assets\Scripts\Ui\RotateTowardPlayer.cs" />
     <Compile Include="Assets\DefaultURPAssets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\Interactables\Button.cs" />
     <Compile Include="Assets\Scripts\Interactables\EventTrigger.cs" />
     <Compile Include="Assets\Scripts\Camera\FirstPersonCameraController.cs" />
     <Compile Include="Assets\Scripts\Clone\CloneManager.cs" />
+    <Compile Include="Assets\Scripts\Ui\DisableOutOfRange.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerMovement.cs" />
     <Compile Include="Assets\Scripts\Clone\CloneBehaviour.cs" />
     <Compile Include="Assets\Scripts\Interactables\Interactable.cs" />
-    <Compile Include="Assets\Scripts\Ui\RotateTowardPlayer.cs" />
-    <Compile Include="Assets\Scripts\Ui\DisableOutOfRange.cs" />
-    <Compile Include="Assets\Scripts\Ui\ChangeTextOnButton.cs" />
-    <Compile Include="Assets\Scripts\Ui\ChangeTextMeshRend.cs" />
-    <Compile Include="Assets\Scripts\PowerUpCollecter.cs" />
-    <Compile Include="Assets\SpawnPointManager.cs" />
+    <Compile Include="Assets\Scripts\Player\SpawnPointManager.cs" />
+    <Compile Include="Assets\Scripts\Interactables\Level\KillOnContact.cs" />
+    <Compile Include="Assets\Scripts\Player\ActivateSpawnPoint.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
