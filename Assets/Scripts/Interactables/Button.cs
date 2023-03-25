@@ -8,10 +8,8 @@ namespace MightBMaybe.Cleone.Interactables
     {
         ButtonType bt;
         public EventTrigger et;
-        [Tooltip("Type the type of button (ie what activates the button)\n\nPlayer:    Player, Clones \nClone:   Clones  ")]
+        [Tooltip("Type the type of button (ie what activates the button)\n\nPlayer:    Player, Clones \nClone:   Clones \nHeavy: heavy clones ")]
         public string buttonType;
-        [HideInInspector]
-        public Dictionary<string, ButtonType> ButtonTypes = new Dictionary<string, ButtonType>();
         public bool isActivated;
 
 
@@ -20,10 +18,6 @@ namespace MightBMaybe.Cleone.Interactables
         void Start()
         {
             et = GetComponent<EventTrigger>();
-            ButtonTypes.Add("Player", new PlayerButton());
-            ButtonTypes.Add("Clone", new CloneButton());
-            //ButtonTypes.Add("HeavyClone", 3);
-            //ButtonTypes.Add("MultiClone", 4);
             AssignButtonType(buttonType);
 
         }
@@ -35,7 +29,7 @@ namespace MightBMaybe.Cleone.Interactables
         }
         public void AssignButtonType(string val)
         {
-            ButtonTypes.TryGetValue(val, out bt);
+            InteractableManager.instance.ButtonTypes.TryGetValue(val, out bt);
         }
         private void OnCollisionEnter(Collision collision)
         {
@@ -43,7 +37,7 @@ namespace MightBMaybe.Cleone.Interactables
             bool canInteract = false;
             foreach (string s in bt.GetTags())
             {
-                if (collision.collider.CompareTag(s)) { canInteract = true; }
+                if (collision.collider.CompareTag(s)) { canInteract = true; break; }
             }
             if (canInteract)
             {
@@ -58,7 +52,7 @@ namespace MightBMaybe.Cleone.Interactables
             bool canInteract = false;
             foreach (string s in bt.GetTags())
             {
-                if (collision.collider.CompareTag(s)) { canInteract = true; }
+                if (collision.collider.CompareTag(s)) { canInteract = true; break; }
             }
             if (canInteract)
             {
@@ -69,8 +63,8 @@ namespace MightBMaybe.Cleone.Interactables
     }
     public class ButtonType
     {
-        public List<string> ActivatableTags;
-        public virtual List<string> GetTags()
+        public string[] ActivatableTags;
+        public virtual string[] GetTags()
         {
             return ActivatableTags;
         }
@@ -79,14 +73,22 @@ namespace MightBMaybe.Cleone.Interactables
     {
         public PlayerButton()
         {
-            ActivatableTags = new List<string>() { "Player", "Clone" };
+            ActivatableTags = new string[] { "Player", "Clone" };
         }
     }
     public class CloneButton : ButtonType
     {
         public CloneButton()
         {
-            ActivatableTags = new List<string>() { "HeavyClone", "Clone" };
+            ActivatableTags = new string[] { "HeavyClone", "Clone" };
         }
     }
+    public class HeavyButton : ButtonType
+    {
+        public HeavyButton()
+        {
+            ActivatableTags = new string[] { "HeavyClone" };
+        }
+    }
+
 }

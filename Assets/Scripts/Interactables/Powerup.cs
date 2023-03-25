@@ -9,7 +9,7 @@ namespace MightBMaybe.Cleone.Interactables {
     {
         // Define the enumeration for the five options
         CloneManager cm;
-        [Tooltip("insert name of the type of clone:\nNonRigid: does not interact with player \nRigid: Interacts with player")]
+        [Tooltip("insert name of the type of clone:\nNonRigid: does not interact with player \nRigid: Interacts with player\nHeavy: rigid clone that works with heavy buttons.")]
         public string TypeName;
         [SerializeField] CloneTypes cloneType;
         private void Start()
@@ -21,7 +21,7 @@ namespace MightBMaybe.Cleone.Interactables {
             GetComponent<MeshRenderer>().material.color = color;
 
 
-            Debug.Log(cloneType.tagName);
+
 
         }
 

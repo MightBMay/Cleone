@@ -10,7 +10,7 @@ namespace MightBMaybe.Cleone.Clones
 {
     public class CloneManager : MonoBehaviour
     {   [HideInInspector]
-        public Dictionary<string, CloneTypes> cloneTypes= new Dictionary<string, CloneTypes>();
+      
         public static CloneManager cloneManager;
         
         [Header("Clone Variables")]
@@ -26,6 +26,7 @@ namespace MightBMaybe.Cleone.Clones
         private GameObject grabbedObject;
         Transform player;
         Material cloneTextMaterial;
+        public List<GameObject> clones = new List<GameObject>();
         private void Awake()
         {
             cloneManager = this;
@@ -38,7 +39,7 @@ namespace MightBMaybe.Cleone.Clones
              cloneTextMaterial = new Material(Shader.Find("TextMeshPro/DistanceFieldOverlay"));
         }
 
-        public List<GameObject> clones = new List<GameObject>();
+        
 
         void Update()
         {
@@ -66,11 +67,17 @@ namespace MightBMaybe.Cleone.Clones
         {
             Grab();
         }
+
+
+
+        public Dictionary<string, CloneTypes> cloneTypes = new Dictionary<string, CloneTypes>();
         private void InstantiateCloneTypeList()
         {
             cloneTypes.Add("NonRigid", new NonRigidClone());
             cloneTypes.Add("Rigid", new RigidClone());
+            cloneTypes.Add("Heavy", new HeavyClone());
         }
+
 
         public void CreateClone()
         {
@@ -305,8 +312,9 @@ namespace MightBMaybe.Cleone.Clones
         public Color32   cloneColour;
         public Vector3 positionOffset;
         public Vector3 Scale;
+        public bool canGrab;
 
-        public virtual bool TryGrab() { return false; }
+        public virtual bool TryGrab() { return canGrab; }
         public virtual int GetLayer()
         {
             int layer = LayerMask.NameToLayer(layerName);
@@ -331,11 +339,12 @@ namespace MightBMaybe.Cleone.Clones
         {
             layerName = "NonRigidClone";
             tagName = "Clone";
+            canGrab = true;
             cloneColour = new Color32(141, 201, 188,255);
             positionOffset = new Vector3(0, 0, 0);
             Scale = new Vector3(1, 2, 1);
         }
-        public override bool TryGrab() { return true; }
+        
 
 
     }
@@ -345,12 +354,26 @@ namespace MightBMaybe.Cleone.Clones
         {
             layerName = "RigidClone";
             tagName = "Clone";
+            canGrab = true;
             cloneColour = new Color32(74, 150, 158,255);
             positionOffset = new Vector3(0, 0, 0);
             Scale = new Vector3(1, 2, 1);
         }
-        public override bool TryGrab() { return true; }
 
+
+
+    }
+    public class HeavyClone : CloneTypes
+    {
+        public HeavyClone()
+        {
+            layerName = "RigidClone";
+            tagName = "HeavyClone";
+            canGrab = true;
+            cloneColour = new Color32(38, 36, 36, 255);
+            positionOffset = new Vector3(0, 0, 0);
+            Scale = new Vector3(1, 2, 1);
+        }
 
     }
 
