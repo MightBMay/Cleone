@@ -34,18 +34,27 @@ namespace MightBMaybe.Cleone.Player
             MovePlayer(GetMovementInput());
             RotatePlayer();
         }
+
+
+        /// <summary>Gets player Movement input.</summary>
+        /// <returns>Vector with x/z input..</returns>
         private Vector3 GetMovementInput()
         {
             float xInp = Input.GetAxisRaw("Horizontal");
             float yInp = Input.GetAxisRaw("Vertical");
             return new Vector3(xInp, 0, yInp);
         }
+        /// <summary>Gets player camera rotation input.</summary>
+        /// <returns>Vector with x/y rotation input.</returns>
         private Vector2 GetMouseInput()
         {
             float mouseX = Input.GetAxis("Mouse X");
             float mouseY = Input.GetAxis("Mouse Y");
             return new Vector2(mouseX, mouseY).normalized;
         }
+
+        /// <summary>Moves player in direction of inputDir.</summary>
+        /// <param name="inputDir">Direction of movement</param>
         private void MovePlayer(Vector3 inputDir)
         {
             float moveSpeed = PlayerStats.pStats.MStats.moveSpeed;
@@ -73,6 +82,9 @@ namespace MightBMaybe.Cleone.Player
             );
             rb.velocity = clampedVel;
         }
+
+        /// <summary>Rotates player according to Mouse Input.</summary>
+
         private void RotatePlayer()
         {
             Vector2 mouseInp = GetMouseInput();
@@ -90,6 +102,9 @@ namespace MightBMaybe.Cleone.Player
             transform.localRotation = Quaternion.Euler(playerRotation);
             
         }
+
+        /// <summary>Reposition player to the nearest active SpawnPoint.</summary>
+
         public void RespawnPlayer()
         {
             transform.position = spawnMan.GetClosestSpawnPoint().position;

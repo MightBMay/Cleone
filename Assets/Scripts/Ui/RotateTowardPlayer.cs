@@ -4,7 +4,9 @@ using UnityEngine;
 using TMPro;
 namespace MightBMaybe.Cleone.UI
 {
-
+    /// <summary>
+    /// Rotates this GameObjects RectTransform to face the player.
+    /// </summary>
     public class RotateTowardPlayer : MonoBehaviour
     {
         Transform playerTransform;

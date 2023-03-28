@@ -5,6 +5,9 @@ namespace MightBMaybe.Cleone.Clones
 {
     public class CloneBehaviour : MonoBehaviour
     {
+        /// <summary>
+        /// This clones CloneType
+        /// </summary>
         public CloneTypes CloneType;
     }
 }

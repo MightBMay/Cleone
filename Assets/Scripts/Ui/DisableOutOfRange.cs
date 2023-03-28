@@ -5,6 +5,9 @@ using TMPro;
 namespace MightBMaybe.Cleone.UI
 {
 
+    /// <summary>
+    /// Disables GameObjects TextMeshProUGUI component when out of range.
+    /// </summary>
     public class DisableOutOfRange : MonoBehaviour
     {
         TextMeshProUGUI text;

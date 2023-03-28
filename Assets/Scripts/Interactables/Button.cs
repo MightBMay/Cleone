@@ -22,15 +22,18 @@ namespace MightBMaybe.Cleone.Interactables
 
         }
 
-        // Update is called once per frame
-        void Update()
-        {
 
-        }
+        /// <summary>
+        /// Assigns button type to this button.
+        /// </summary>
+        /// <param name="val">Name of button type.</param>
         public void AssignButtonType(string val)
         {
             InteractableManager.instance.ButtonTypes.TryGetValue(val, out bt);
         }
+        /// <summary>
+        /// Activates button when collision is entered with an object that shares its tag with this buttons ActivatableTags.
+        /// </summary>
         private void OnCollisionEnter(Collision collision)
         {
             if(et.trigger.isTriggered == true) { return; }
@@ -46,6 +49,10 @@ namespace MightBMaybe.Cleone.Interactables
                 //make activation sequence.
             }
         }
+        /// <summary>
+        /// Deactivates button when collision is exited with an object that shares its tag with this buttons ActivatableTags.
+        /// </summary>
+
         private void OnCollisionExit(Collision collision)
         {
             if (et.trigger.isTriggered == false) { return; }
@@ -61,6 +68,9 @@ namespace MightBMaybe.Cleone.Interactables
             }
         }
     }
+    /// <summary>
+    /// base button class containing an array of tags the button can collide with.
+    /// </summary>
     public class ButtonType
     {
         public string[] ActivatableTags;
@@ -69,6 +79,9 @@ namespace MightBMaybe.Cleone.Interactables
             return ActivatableTags;
         }
     }
+    /// <summary>
+    /// Player Buttons can be triggered by: Players, Clones
+    /// </summary>
     public class PlayerButton : ButtonType
     {
         public PlayerButton()
@@ -76,6 +89,9 @@ namespace MightBMaybe.Cleone.Interactables
             ActivatableTags = new string[] { "Player", "Clone" };
         }
     }
+    /// <summary>
+    /// Clone Buttons can be triggered by: Clones, Heavy Clones
+    /// </summary>
     public class CloneButton : ButtonType
     {
         public CloneButton()
@@ -83,6 +99,9 @@ namespace MightBMaybe.Cleone.Interactables
             ActivatableTags = new string[] { "HeavyClone", "Clone" };
         }
     }
+    /// <summary>
+    /// Heavy Buttons can be triggered by: Heavy Clones
+    /// </summary>
     public class HeavyButton : ButtonType
     {
         public HeavyButton()

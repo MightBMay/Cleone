@@ -22,10 +22,11 @@ namespace MightBMaybe.Cleone.Clones
         public float grabSpeed;
         [Tooltip("self explanitory.")]
         public float maxGrabRange;
-        private KeyCode[] cloneKeys = { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3 };
+        readonly KeyCode[] cloneKeys = { KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3 };
         private GameObject grabbedObject;
         Transform player;
         Material cloneTextMaterial;
+
         public List<GameObject> clones = new List<GameObject>();
         private void Awake()
         {
@@ -38,9 +39,6 @@ namespace MightBMaybe.Cleone.Clones
         {
              cloneTextMaterial = new Material(Shader.Find("TextMeshPro/DistanceFieldOverlay"));
         }
-
-        
-
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.C))
@@ -68,9 +66,9 @@ namespace MightBMaybe.Cleone.Clones
             Grab();
         }
 
-
-
         public Dictionary<string, CloneTypes> cloneTypes = new Dictionary<string, CloneTypes>();
+        
+        /// <summary>Adds to Dictionary cloneTypes to create a pool of clone types to reference and instantiate from for other methods.</summary>
         private void InstantiateCloneTypeList()
         {
             cloneTypes.Add("NonRigid", new NonRigidClone());
@@ -78,7 +76,7 @@ namespace MightBMaybe.Cleone.Clones
             cloneTypes.Add("Heavy", new HeavyClone());
         }
 
-
+        /// <summary>Creates a GameObject to become a clone. Assigns a CloneTypes to the clone through AssignCloneData(), and gives it a Canvas with AddCanvasToWorldSpace(). Adds the clone to the players list of clones..</summary>
         public void CreateClone()
         {
             
@@ -104,6 +102,9 @@ namespace MightBMaybe.Cleone.Clones
  
         }
         
+        /// <summary>Assigns CloneTypes of type "type" and a rigid body to cloneObj. Applies properties of the CloneTypes "type" </summary>
+        /// <param name="param1">Gameobject to become the clone.</param>
+        /// <param name="param2">Child class of Clonetypes the clone will inherit.</param>
         private void AssignCloneData(GameObject cloneObj,CloneTypes type)
         {
             // Instantiate a cube primitive
@@ -122,15 +123,14 @@ namespace MightBMaybe.Cleone.Clones
             cloneObj.GetComponent<MeshRenderer>().material.color = type.cloneColour;
 
         }
+
+        /// <summary>If player has a grabbed object, position it in front of the player, a set units distance away.</summary>
         private void Grab()
         {
-            
-            
-
 
             if (grabbedObject == null) return;
             if (Vector3.Distance(grabbedObject.transform.position, player.position)>= maxGrabRange+0.2f) { grabbedObject = null; return; }
-            Collider collider = grabbedObject.GetComponent<Collider>();
+            //Collider collider = grabbedObject.GetComponent<Collider>();
             Rigidbody rigidBody = grabbedObject.GetComponent<Rigidbody>();
             if (rigidBody.useGravity) rigidBody.useGravity = false;
             //if(collider.enabled) collider.enabled = false;
@@ -140,6 +140,7 @@ namespace MightBMaybe.Cleone.Clones
 
         }
 
+        /// <summary>Increases distance between player and grabbed object depending on Scroll Wheel delta.</summary>
         private void UpdateGrabOffset()
         {
             if (grabbedObject != null)
@@ -154,16 +155,23 @@ namespace MightBMaybe.Cleone.Clones
                 }
             }
         }
-
+        
+        /// <summary>
+        /// Shoots ray forwards looking for clone. Checks if clone is grabbable.
+        /// </summary>
+        /// <returns>Game object of the clone with canGrab = true</returns>
         private GameObject TryGrabClone()
         {
-
+            // if the player currently has a object grabbed:
             if (grabbedObject != null) {
+                // enable colliders and rigidbody gravity, if the object has them.
                 Collider col = grabbedObject.GetComponent<Collider>();
                 Rigidbody rb = grabbedObject.GetComponent<Rigidbody>();               
+                CloneBehaviour cb = grabbedObject.GetComponent<CloneBehaviour>();
                 if (col != null) col.enabled = true;
-                if (col != null) rb.useGravity = true;
-                grabbedObject.layer = grabbedObject.GetComponent<CloneBehaviour>().CloneType.GetLayer();
+                if (rb != null) rb.useGravity = true;
+                if (cb != null)  grabbedObject.layer = cb.CloneType.GetLayer(); //sets the objects layer back to the clonetype.layer if grabbed object has clonebehaviour.
+
                 return null;
             }
 
@@ -184,7 +192,10 @@ namespace MightBMaybe.Cleone.Clones
             }
             return null;
         }
-
+        /// <summary>
+        /// Creates a World Canvas with a TextMeshPro child object. Assigns shader so the text will render on top of everything.
+        /// </summary>
+        /// <param name="targetObject">Target Object to add the Canvas to.</param>
         public void AddCanvasToWorldSpace(GameObject targetObject)
         {
             // Create a new Canvas object and set its properties
@@ -215,6 +226,10 @@ namespace MightBMaybe.Cleone.Clones
             UpdateCloneText();
             
         }
+        
+        /// <summary>
+        /// Updates the text displaying what number the clone is.
+        /// </summary>
 
         public void UpdateCloneText()
         {
@@ -224,6 +239,9 @@ namespace MightBMaybe.Cleone.Clones
             }
         }
 
+        /// <summary>
+        /// Shoots ray from camera to clone 1-9 depending on key held. if it does not collide with anything, swap clone and player positions.
+        /// </summary>
 
         private void TeleportInput()
         {
@@ -236,21 +254,22 @@ namespace MightBMaybe.Cleone.Clones
                     // Check if the clones list contains a clone at the current index
                     if (i < clones.Count)
                     {
-                        // Get the clone at the current index and do something with it
-                        Transform clone = clones[i].transform;
-                        Vector3 cameraPosition = Camera.main.transform.position;
+                        
+                        Transform clone = clones[i].transform;// get clone at index I
+                        Vector3 cameraPosition = Camera.main.transform.position;//get camera position
                         Vector3 clonePosition = clone.position;
-                        Vector3 direction = clonePosition - cameraPosition;
+                        Vector3 direction = clonePosition - cameraPosition;// get the direction from the camera to the clone.
                         RaycastHit hit;
-                        Physics.Raycast(cameraPosition, direction, out hit);
-                        if (hit.collider.gameObject == clones[i])
+                        Physics.Raycast(cameraPosition, direction, out hit);//shoot ray from camera towards clone at index I
+
+                        if (hit.collider.gameObject == clones[i]) // if the ray hits no object (other than the clone at index I):
                         {
-                            // No obstacles found, set the player's position and rotation
-                            Vector3 storedPos = player.transform.position;
+                            
+                            Vector3 storedPos = player.transform.position;// temperarily store player's position and rotation.
                             Quaternion storedRot = player.transform.rotation;
-                            player.transform.position = clonePosition;
+                            player.transform.position = clonePosition; // send player to position and rotation of the clone.
                             player.transform.rotation = clone.rotation;
-                            clone.position = storedPos;
+                            clone.position = storedPos;// send clone to position and rotation of the player's temperarily stored position.
                             clone.rotation = storedRot;
                         }
                         else
@@ -268,16 +287,22 @@ namespace MightBMaybe.Cleone.Clones
             }
         }
 
-        
+        /// <summary>
+        /// Destroys all clones, and removes them from the Clone list.
+        /// </summary>
+
         public void ClearClones()
         {
+            
             while (clones.Count> 0){
             
                 Destroy(clones[0]);
                 clones.Remove(clones[0]);
             }
         }
-
+        /// <summary>
+        /// Resets all powerups to their original state.
+        /// </summary>
         public void ResetPowerUps()
         {
             var powerCollecters = FindObjectsOfType<PowerUpCollecter>();
@@ -286,7 +311,9 @@ namespace MightBMaybe.Cleone.Clones
                 p.ResetCollect();
             }
         }
-
+        /// <summary>
+        /// Resets all buttons to their original state.
+        /// </summary>
         public void ResetButtons()
         {
             var buttons = FindObjectsOfType<Button>();
@@ -295,7 +322,9 @@ namespace MightBMaybe.Cleone.Clones
                 b.et.trigger.isTriggered = false;
             }
         }
-        
+        /// <summary>
+        /// Resets all Clones and interactables to their original state.
+        /// </summary>
         public void ResetClonesAndInteractables()
         {
             ClearClones();
@@ -305,16 +334,27 @@ namespace MightBMaybe.Cleone.Clones
         }
 
     }
+
+    /// <summary>Base CloneTypes Class. stores information all clones must have.</summary>
     public class CloneTypes
     {
-        public string layerName;
+        /// <summary>Name of the layer this clone will be</summary>
+
+        public string layerName; 
+
+        /// <summary>Name of the tag this clone will be</summary>
         public string tagName;
-        public Color32   cloneColour;
+
+        /// <summary>Colour value (r,g,b,a), 0-255 of the clone</summary>
+        public Color32 cloneColour;
+
         public Vector3 positionOffset;
         public Vector3 Scale;
         public bool canGrab;
 
         public virtual bool TryGrab() { return canGrab; }
+        /// <summary>Get the Layer ID of layer of name "layerName" </summary>
+        /// <returns>int Layer ID </returns>
         public virtual int GetLayer()
         {
             int layer = LayerMask.NameToLayer(layerName);
@@ -333,6 +373,7 @@ namespace MightBMaybe.Cleone.Clones
             return tagName;
         }
     }
+    /// <summary>Non-Rigid Clone WILL NOT interact with the player.</summary>
     public class NonRigidClone : CloneTypes
     {
         public NonRigidClone()
@@ -348,6 +389,7 @@ namespace MightBMaybe.Cleone.Clones
 
 
     }
+    /// <summary>Rigid Clone WILL interact with the player </summary>
     public class RigidClone : CloneTypes
     {
         public RigidClone()
@@ -363,13 +405,14 @@ namespace MightBMaybe.Cleone.Clones
 
 
     }
+    /// <summary> Heavy Clone WILL interact with the player. Cannot Be Grabbed. </summary>
     public class HeavyClone : CloneTypes
     {
         public HeavyClone()
         {
             layerName = "RigidClone";
             tagName = "HeavyClone";
-            canGrab = true;
+            canGrab = false;
             cloneColour = new Color32(38, 36, 36, 255);
             positionOffset = new Vector3(0, 0, 0);
             Scale = new Vector3(1, 2, 1);

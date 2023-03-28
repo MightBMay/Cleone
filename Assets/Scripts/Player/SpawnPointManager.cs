@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace MightBMaybe.Cleone.Player
 {
+    /// <summary>
+    /// Keeps track of all spawn points in a level.
+    /// </summary>
     public class SpawnPointManager : MonoBehaviour
     {
         
@@ -15,7 +18,10 @@ namespace MightBMaybe.Cleone.Player
             
             player = GameObject.Find("PlayerBody").transform;
         }
-
+        /// <summary>
+        /// Scans all activated spawn points for the closest.
+        /// </summary>
+        /// <returns>The closest ACTIVATED spawn point to the player.</returns>
         public Transform GetClosestSpawnPoint()
         {
             float cDist = Mathf.Infinity;

@@ -22,6 +22,9 @@ public class ElevatorExit : MonoBehaviour
     {
         MoveElevator();
     }
+    /// <summary>
+    /// Moves the elevator from its starting position downwards. Locks player's position to the elevators.
+    /// </summary>
     public void MoveElevator()
     {
         if (isActivated && transform.position.y >= to.position.y-0.5f)
@@ -32,8 +35,15 @@ public class ElevatorExit : MonoBehaviour
         }
 
     }
+    /// <summary>
+    /// Starts elevator when player enters the trigger.
+    /// </summary>
+    /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     {
-        isActivated = true;
+        if (other.CompareTag("Player"))
+        {
+            isActivated = true;
+        }
     }
 }

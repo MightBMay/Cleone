@@ -7,7 +7,6 @@ namespace MightBMaybe.Cleone.Interactables {
 
     public class Powerup : MonoBehaviour
     {
-        // Define the enumeration for the five options
         CloneManager cm;
         [Tooltip("insert name of the type of clone:\nNonRigid: does not interact with player \nRigid: Interacts with player\nHeavy: rigid clone that works with heavy buttons.")]
         public string TypeName;
@@ -25,6 +24,9 @@ namespace MightBMaybe.Cleone.Interactables {
 
         }
 
+        /// <summary>
+        /// Collects powerup and assigns its properties to the player.
+        /// </summary>
 
         private void OnTriggerEnter(Collider collider)
         {

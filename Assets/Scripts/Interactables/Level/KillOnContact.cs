@@ -5,6 +5,9 @@ using MightBMaybe.Cleone.Player;
 using MightBMaybe.Cleone.Clones;
 
 namespace MightBMaybe.Cleone.Interactables {
+    /// <summary>
+    /// i mean, cmon. pretty self explanatory.
+    /// </summary>
     public class KillOnContact : MonoBehaviour
     {
         private void OnCollisionEnter(Collision collision)

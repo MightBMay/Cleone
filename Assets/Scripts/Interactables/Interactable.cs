@@ -45,7 +45,12 @@ namespace MightBMaybe.Cleone.Interactables {
             }
         }
 
-
+        /// <summary>
+        /// Gets a list of all child GameObjects with a specific script.
+        /// </summary>
+        /// <param name="parent">Parent object from which to search cildren.</param>
+        /// <param name="scriptType">Script you are looking for Children to have.</param>
+        /// <returns></returns>
         public List<GameObject> GetChildObjectsWithScript(GameObject parent, System.Type scriptType)
         {
             List<GameObject> result = new List<GameObject>();
